@@ -31,7 +31,7 @@ You can download latest version from [here](https://github.com/mohabhassan/Night
  - Use Visual Studio 2019
  - Start VS2019 Developer PowerShell
  - `cd dgamexwrapper`
- - `build_deps.bat all` to build dependencies, you can also build specific dependencies: `build_deps.bat wolfssl curl libcurl`
+ - `build_deps.ps1 all` to build dependencies, you can also build specific dependencies: `build_deps.bat wolfssl curl libcurl` . run `build_deps.ps1` to see a list of dependencies
  - Build NightFall using `dgamexwrapper.sln` (use any configuration other than Debug)
  
  

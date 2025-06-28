@@ -30,7 +30,7 @@ function Build-libcURL {
 	echo '==================='
 	echo 'Building libcURL...'
 	echo '==================='
-	if(-Not (Test-Path -Path ./libs/curl/projects/Windows/VC14.10/lib/libcurl.sln -PathType Leaf))
+	if(-Not (Test-Path -Path ./libs/curl/projects/Windows/VC14.10/lib/libcurl.vcxproj -PathType Leaf))
 	{
 		echo 'Generating project files...'
 		cd ./libs/curl/projects
@@ -47,7 +47,7 @@ function Build-cURL {
 	echo '==================='
 	echo 'Building cURL...'
 	echo '==================='
-	if(-Not (Test-Path -Path ./libs/curl/projects/Windows/VC14.10/src/curl.sln -PathType Leaf))
+	if(-Not (Test-Path -Path ./libs/curl/projects/Windows/VC14.10/src/curl.vcxproj -PathType Leaf))
 	{
 		echo 'Generating project files...'
 		cd ./libs/curl/projects
@@ -115,15 +115,62 @@ echo '=============================================='
 echo 'NightFall Dependencies/Submodules Build Script'
 echo '=============================================='
 echo '=============================================='
+$cmdMap = @{
+    wolfssl  = 'Build-WolfSSL'
+    wolfssl_client  = 'Build-WolfSSL-Client'
+    libcurl   = 'Build-libcURL'
+    curl = 'Build-cURL'
+    curlpp = 'Build-cURLpp'
+    detours = 'Build-detours'
+    sqlitecpp = 'Build-SQLiteCpp'
+}
+
+
+
+function Show-Help {
+	$cmdList = $cmdMap.Keys -join '] ['
+	
+	echo '=============================================='
+    Write-Host "Usage: build_deps.ps1 [all] [$cmdList]"
+    Write-Host ""
+    Write-Host "Available commands:"
+    Write-Host "  all     - Build all"
+    foreach ($cmd in $cmdMap.Keys) {
+        Write-Host ("  {0,-8} - Build '{0}'" -f $cmd)
+    }
+	echo '=============================================='
+}
+
+if (-not $args) {
+    Write-Host "No arguments provided."
+	Show-Help
+	exit 1
+}
+
 $rootdir = $pwd
 $build_all = 'all' -in $Args
-if($build_all -or 'wolfssl' -in $Args) {Build-WolfSSL $rootdir}
-if($build_all -or 'wolfssl_client' -in $Args) {Build-WolfSSL-Client $rootdir}
-if($build_all -or 'libcurl' -in $Args) {Build-libcURL $rootdir}
-if($build_all -or 'curl' -in $Args) {Build-cURL $rootdir}
-if($build_all -or 'curlpp' -in $Args) {Build-cURLpp $rootdir}
-if($build_all -or 'detours' -in $Args) {Build-detours $rootdir}
-if($build_all -or 'sqlitecpp' -in $Args) {Build-SQLiteCpp $rootdir}
+if (-not $build_all) {
+	foreach ($arg in $args) {
+		if (-not $cmdMap.ContainsKey($arg)) {
+			Write-Host "Unknown command: '$arg'"
+			Show-Help
+			exit 1
+		}
+	}
+}
+	
+$toRun = if ($build_all) { $cmdMap.Keys } else { $args }
+foreach ($cmd in $toRun) {
+    & $cmdMap[$cmd] $rootdir
+}
+
+#if($build_all -or 'wolfssl' -in $Args) {Build-WolfSSL $rootdir}
+#if($build_all -or 'wolfssl_client' -in $Args) {Build-WolfSSL-Client $rootdir}
+#if($build_all -or 'libcurl' -in $Args) {Build-libcURL $rootdir}
+#if($build_all -or 'curl' -in $Args) {Build-cURL $rootdir}
+#if($build_all -or 'curlpp' -in $Args) {Build-cURLpp $rootdir}
+#if($build_all -or 'detours' -in $Args) {Build-detours $rootdir}
+#if($build_all -or 'sqlitecpp' -in $Args) {Build-SQLiteCpp $rootdir}
 echo '=============================================='
 echo '=============================================='
 echo '    Dependencies/Submodules Build Done        '
