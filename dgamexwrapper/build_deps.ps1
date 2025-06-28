@@ -115,7 +115,7 @@ echo '=============================================='
 echo 'NightFall Dependencies/Submodules Build Script'
 echo '=============================================='
 echo '=============================================='
-$cmdMap = @{
+$cmdMap = [ordered]@{
     wolfssl  = 'Build-WolfSSL'
     wolfssl_client  = 'Build-WolfSSL-Client'
     libcurl   = 'Build-libcURL'
